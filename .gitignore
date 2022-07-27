@@ -16,3 +16,4 @@
 
 # --- custom ---
 __debug_bin
+*.log
