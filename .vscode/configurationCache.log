@@ -1,0 +1,1 @@
+{"buildTargets":["build","build-local","down","dry-migrate","generate","help","logs","migrate","ps","test","up"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
