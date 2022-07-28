@@ -17,3 +17,6 @@
 # --- custom ---
 __debug_bin
 *.log
+tmp/
+_tools/mysql/data/
+.env
