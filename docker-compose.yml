@@ -29,7 +29,7 @@ services:
       MYSQL_PASSWORD: todo
       MYSQL_DATABASE: todo
     volumes:
-      - todo-db-data:/var/lib/mysql
+      - ./_shared_volumes/todo-db-data:/var/lib/mysql
       - $PWD/_tools/mysql/conf.d:/etc/mysql/conf.d:cached
     ports:
       - "33306:3306"
@@ -40,8 +40,4 @@ services:
     ports:
       - "36379:6379"
     volumes:
-      - todo-redis-data:/data
-
-volumes:
-  todo-db-data:
-  todo-redis-data:
+      - ./_shared_volumes/todo-redis-data:/data
