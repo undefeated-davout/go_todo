@@ -17,5 +17,6 @@ CMD ["./app"]
 
 FROM golang:1.18.2 as dev
 WORKDIR /app
+RUN echo "alias ll='ls -lahF --color=auto'" >> ~/.bashrc && . ~/.bashrc
 RUN go install github.com/cosmtrek/air@latest
 CMD ["air"]
