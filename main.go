@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/undefeated-davout/go_todo/config"
 	"golang.org/x/sync/errgroup"
@@ -39,8 +38,8 @@ func run(ctx context.Context) error {
 		// 引数で受け取ったnet.Listenerを利用するので、
 		// Addrフィールドは指定しない
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// コマンドラインで実験するため
-			time.Sleep(5 * time.Second)
+			// // コマンドラインで実験するため
+			// time.Sleep(5 * time.Second)
 			fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 		}),
 	}
