@@ -17,14 +17,13 @@ func AssertJSON(t *testing.T, want, got []byte) {
 	if err := json.Unmarshal(want, &jw); err != nil {
 		t.Fatalf("cannot unmarshal want %q: %v", want, err)
 	}
-	if err := json.Unmarshal(want, &jg); err != nil {
-		t.Fatalf("cannot unmarshal want %q: %v", want, err)
+	if err := json.Unmarshal(got, &jg); err != nil {
+		t.Fatalf("cannot unmarshal got %q: %v", got, err)
 	}
 	if diff := cmp.Diff(jg, jw); diff != "" {
 		t.Errorf("got differs: (-got +want)\n%s", diff)
 	}
 }
-
 func AssertResponse(t *testing.T, got *http.Response, status int, body []byte) {
 	t.Helper()
 	t.Cleanup(func() { _ = got.Body.Close() })
@@ -37,6 +36,8 @@ func AssertResponse(t *testing.T, got *http.Response, status int, body []byte) {
 	}
 
 	if len(gb) == 0 && len(body) == 0 {
+		// 期待としても実体としてもレスポンスボディがないので
+		// AssertJSONを呼ぶ必要はない。
 		return
 	}
 	AssertJSON(t, body, gb)
