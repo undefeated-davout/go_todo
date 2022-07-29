@@ -27,13 +27,11 @@ func NewServer(l net.Listener, mux http.Handler) *Server {
 func (s *Server) Run(ctx context.Context) error {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer stop()
-
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		// ListenAndServeメソッドではなく、Serveメソッドに変更する
+		// http.ErrServerClosed は
+		// http.Server.Shutdown() が正常に終了したことを示すので異常ではない。
 		if err := s.srv.Serve(s.l); err != nil &&
-			// http.ErrServerClosed は
-			// http.Server.Shutdown() が正常に終了したことを示すので異常ではない。
 			err != http.ErrServerClosed {
 			log.Printf("failed to close: %+v", err)
 			return err
