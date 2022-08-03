@@ -6,13 +6,20 @@ import (
 	"github.com/undefeated-davout/go_todo/entity"
 )
 
-func (r *Repository) AddTask(ctx context.Context, db Execer, t *entity.Task) error {
+func (r *Repository) AddTask(
+	ctx context.Context, db Execer, t *entity.Task,
+) error {
 	t.Created = r.Clocker.Now()
 	t.Modified = r.Clocker.Now()
-	sql := `INSERT INTO task (title, status, created, modified) VALUES (?,?,?,?)`
-	result, err := db.ExecContext(ctx, sql, t.Title, t.Status)
+	sql := `INSERT INTO task
+		(title, status, created, modified)
+	VALUES (?, ?, ?, ?)`
+	result, err := db.ExecContext(
+		ctx, sql, t.Title, t.Status,
+		t.Created, t.Modified,
+	)
 	if err != nil {
-		return nil
+		return err
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
@@ -22,9 +29,14 @@ func (r *Repository) AddTask(ctx context.Context, db Execer, t *entity.Task) err
 	return nil
 }
 
-func (r *Repository) ListTasks(ctx context.Context, db Queryer) (entity.Tasks, error) {
+func (r *Repository) ListTasks(
+	ctx context.Context, db Queryer,
+) (entity.Tasks, error) {
 	tasks := entity.Tasks{}
-	sql := `SELECT id, title, status, created, modified FROM taks;`
+	sql := `SELECT
+			id, title,
+			status, created, modified
+		FROM task;`
 	if err := db.SelectContext(ctx, &tasks, sql); err != nil {
 		return nil, err
 	}
