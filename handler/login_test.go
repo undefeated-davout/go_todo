@@ -9,31 +9,48 @@ import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/undefeated-davout/go_todo/entity"
 	"github.com/undefeated-davout/go_todo/testutil"
 )
 
-func TestAddTask(t *testing.T) {
+func TestLogin_ServeHTTP(t *testing.T) {
+	type moq struct {
+		token string
+		err   error
+	}
 	type want struct {
 		status  int
 		rspFile string
 	}
 	tests := map[string]struct {
 		reqFile string
+		moq     moq
 		want    want
 	}{
 		"ok": {
-			reqFile: "testdata/add_task/ok_req.json.golden",
+			reqFile: "testdata/login/ok_req.json.golden",
+			moq: moq{
+				token: "from_moq",
+			},
 			want: want{
 				status:  http.StatusOK,
-				rspFile: "testdata/add_task/ok_rsp.json.golden",
+				rspFile: "testdata/login/ok_rsp.json.golden",
 			},
 		},
 		"badRequest": {
-			reqFile: "testdata/add_task/bad_req.json.golden",
+			reqFile: "testdata/login/bad_req.json.golden",
 			want: want{
 				status:  http.StatusBadRequest,
-				rspFile: "testdata/add_task/bad_req_rsp.json.golden",
+				rspFile: "testdata/login/bad_req_rsp.json.golden",
+			},
+		},
+		"internal_server_error": {
+			reqFile: "testdata/login/ok_req.json.golden",
+			moq: moq{
+				err: errors.New("error from mock"),
+			},
+			want: want{
+				status:  http.StatusInternalServerError,
+				rspFile: "testdata/login/internal_server_error_rsp.json.golden",
 			},
 		},
 	}
@@ -45,18 +62,15 @@ func TestAddTask(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest(
 				http.MethodPost,
-				"/tasks",
+				"/login",
 				bytes.NewReader(testutil.LoadFile(t, tt.reqFile)),
 			)
 
-			moq := &AddTaskServiceMock{}
-			moq.AddTaskFunc = func(ctx context.Context, title string) (*entity.Task, error) {
-				if tt.want.status == http.StatusOK {
-					return &entity.Task{ID: 1}, nil
-				}
-				return nil, errors.New("error from mock")
+			moq := &LoginServiceMock{}
+			moq.LoginFunc = func(ctx context.Context, name, pw string) (string, error) {
+				return tt.moq.token, tt.moq.err
 			}
-			sut := AddTask{
+			sut := Login{
 				Service:   moq,
 				Validator: validator.New(),
 			}

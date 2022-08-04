@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/undefeated-davout/go_todo/auth"
 	"github.com/undefeated-davout/go_todo/entity"
 	"github.com/undefeated-davout/go_todo/store"
 )
@@ -14,7 +15,12 @@ type AddTask struct {
 }
 
 func (a *AddTask) AddTask(ctx context.Context, title string) (*entity.Task, error) {
+	id, ok := auth.GetUserID(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user_id not found")
+	}
 	t := &entity.Task{
+		UserID: id,
 		Title:  title,
 		Status: entity.TaskStatusTodo,
 	}

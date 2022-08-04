@@ -5,35 +5,33 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/undefeated-davout/go_todo/entity"
 )
 
-type RegisterUser struct {
-	Service   RegisterUserService
+type Login struct {
+	Service   LoginService
 	Validator *validator.Validate
 }
 
-func (ru *RegisterUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (l *Login) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var b struct {
-		Name     string `json:"name" validate:"required"`
+	var body struct {
+		UserName string `json:"user_name" validate:"required"`
 		Password string `json:"password" validate:"required"`
-		Role     string `json:"role" validate:"required"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&b); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		RespondJSON(ctx, w, &ErrResponse{
 			Message: err.Error(),
 		}, http.StatusInternalServerError)
 		return
 	}
-	if err := ru.Validator.Struct(b); err != nil {
+	err := l.Validator.Struct(body)
+	if err != nil {
 		RespondJSON(ctx, w, &ErrResponse{
 			Message: err.Error(),
 		}, http.StatusBadRequest)
 		return
 	}
-
-	u, err := ru.Service.RegisterUser(ctx, b.Name, b.Password, b.Role)
+	jwt, err := l.Service.Login(ctx, body.UserName, body.Password)
 	if err != nil {
 		RespondJSON(ctx, w, &ErrResponse{
 			Message: err.Error(),
@@ -41,7 +39,10 @@ func (ru *RegisterUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	rsp := struct {
-		ID entity.UserID `json:"id"`
-	}{ID: u.ID}
-	RespondJSON(ctx, w, rsp, http.StatusOK)
+		AccessToken string `json:"access_token"`
+	}{
+		AccessToken: jwt,
+	}
+
+	RespondJSON(r.Context(), w, rsp, http.StatusOK)
 }

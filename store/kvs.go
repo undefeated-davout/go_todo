@@ -10,10 +10,6 @@ import (
 	"github.com/undefeated-davout/go_todo/entity"
 )
 
-type KVS struct {
-	Cli *redis.Client
-}
-
 func NewKVS(ctx context.Context, cfg *config.Config) (*KVS, error) {
 	cli := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", cfg.RedisHost, cfg.RedisPort),
@@ -22,6 +18,10 @@ func NewKVS(ctx context.Context, cfg *config.Config) (*KVS, error) {
 		return nil, err
 	}
 	return &KVS{Cli: cli}, nil
+}
+
+type KVS struct {
+	Cli *redis.Client
 }
 
 func (k *KVS) Save(ctx context.Context, key string, userID entity.UserID) error {
