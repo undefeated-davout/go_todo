@@ -6,9 +6,7 @@ import (
 	"github.com/undefeated-davout/go_todo/entity"
 )
 
-func (r *Repository) AddTask(
-	ctx context.Context, db Execer, t *entity.Task,
-) error {
+func (r *Repository) AddTask(ctx context.Context, db Execer, t *entity.Task) error {
 	t.Created = r.Clocker.Now()
 	t.Modified = r.Clocker.Now()
 	sql := `INSERT INTO task
@@ -29,9 +27,7 @@ func (r *Repository) AddTask(
 	return nil
 }
 
-func (r *Repository) ListTasks(
-	ctx context.Context, db Queryer,
-) (entity.Tasks, error) {
+func (r *Repository) ListTasks(ctx context.Context, db Queryer) (entity.Tasks, error) {
 	tasks := entity.Tasks{}
 	sql := `SELECT
 			id, title,
