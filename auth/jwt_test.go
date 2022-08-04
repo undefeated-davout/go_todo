@@ -38,7 +38,7 @@ func TestJWTer(t *testing.T) {
 	wantID := entity.UserID(20)
 	u := entity.User{
 		ID:       wantID,
-		Name:     "undefeated-davout",
+		Name:     "davout",
 		Password: "test",
 		Role:     "admin",
 		Created:  time.Time{},
