@@ -7,19 +7,6 @@ import (
 	"github.com/undefeated-davout/go_todo/auth"
 )
 
-func AdminMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Print("AdminMiddleware")
-		if !auth.IsAdmin(r.Context()) {
-			RespondJSON(r.Context(), w, ErrResponse{
-				Message: "not admin",
-			}, http.StatusUnauthorized)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
 func AuthMiddleware(j *auth.JWTer) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -34,4 +21,17 @@ func AuthMiddleware(j *auth.JWTer) func(next http.Handler) http.Handler {
 			next.ServeHTTP(w, req)
 		})
 	}
+}
+
+func AdminMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Print("AdminMiddleware")
+		if !auth.IsAdmin(r.Context()) {
+			RespondJSON(r.Context(), w, ErrResponse{
+				Message: "not admin",
+			}, http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
