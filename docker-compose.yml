@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   app:
+    container_name: go-todo.app
     build:
       args:
         - target=dev
@@ -20,9 +21,9 @@ services:
       - "18000:8080"
 
   todo-db:
+    container_name: go-todo.db
     image: mysql:8.0.29
     platform: linux/amd64
-    container_name: todo-db
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_USER: todo
@@ -35,8 +36,8 @@ services:
       - "33306:3306"
 
   todo-redis:
+    container_name: go-todo.redis
     image: "redis:latest"
-    container_name: todo-redis
     ports:
       - "36379:6379"
     volumes:
